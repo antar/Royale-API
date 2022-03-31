@@ -1,4 +1,23 @@
 import requests
 import json
-r = requests.get("https://api.clashroyale.com/v1/players/%23QCCJVJR9/upcomingchests", headers={"Accept":"application/json", "authorization":"Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6Ijg3ZWI2NzUzLTVjNjQtNDNmZi1iOWUyLTFkNDcxYWVjNTQxYiIsImlhdCI6MTY0ODQ1OTQzNywic3ViIjoiZGV2ZWxvcGVyL2MzNWFjYmVhLWExZWEtZGRkMi01ZGE4LTkxNTM0MjE0MzMzNCIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyIxOTQuMjA5LjExLjEyIl0sInR5cGUiOiJjbGllbnQifV19.LaTFvOATRwNSugbaRxgJIUmlbukeOleg54JcM3UwKO6zBC8hFZtwHkA1Y2PeqypwSmvCiX2lEWfzDYnIqtb86A"}, params = {"limit":20})
-print(json.dumps(r.json(), indent = 2))
+
+def getPlayerInformation(): 
+
+    # Getting Players Tag
+    playerTag = input('Please enter your player tag: ')
+    playerTag = playerTag.replace('#', '%23')
+
+    # Read Token FIle
+    playerToken = open('token.txt', 'r').read()
+
+    # API URL
+    baseURL = 'https://api.clashroyale.com/v1/players/' + playerTag
+
+    # API Request
+    headers = {'Accept': 'application/json', 'Authorization': 'Bearer ' + playerToken}
+    call = requests.get(baseURL, headers=headers)
+    response = (json.dumps(call.json(), indent = 2))
+    print(response)
+
+getPlayerInformation()
+
