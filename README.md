@@ -5,8 +5,7 @@ Get your Clash Royale Stats quick and easy.
 
 #### First: 
 
-pip install requests
-pip install fpdf
+pip install requests && pip install fpdf
 
 ### Start: 
 python main.py
