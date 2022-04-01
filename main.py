@@ -1,5 +1,7 @@
 import requests
 import json
+from fpdf import FPDF
+
 
 def getPlayerInformation(): 
 
@@ -16,14 +18,29 @@ def getPlayerInformation():
     # API Request
     headers = {'Accept': 'application/json', 'Authorization': 'Bearer ' + playerToken}
     call = requests.get(baseURL, headers=headers)
-    response = (json.dumps(call.json(), indent = 2))
+    response = call.json()
 
     # Write Request to Log File
-    log = open('log.txt', 'w')
-    log.write(response)
+    log = open('response.log', 'w')
+    log.write(str(response))
     log.close()
 
-    print(response)
+    # Write Data to PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Arial', size = 15)
+
+    # Loop through API Call and fill the PDF
+    responseKeys = ['tag', 'name', 'expLevel', 'trophies', 'bestTrophies', 'wins', 'losses']
+
+    for key in responseKeys: 
+        # Workaround for PDF Cell
+        value = str(response[key])
+        latin = value.encode('latin-1', 'replace').decode('latin-1')
+        pdf.cell(200, 10, txt = key + ': ' + latin, ln = 1, align = 'C')
+
+    pdf.output('data.pdf') 
+
+    print('PDF created...')
 
 getPlayerInformation()
-
