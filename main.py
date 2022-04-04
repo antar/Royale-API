@@ -1,24 +1,54 @@
+import sys
 import requests
 import json
+import smtplib
+import ssl
+import ftplib
 from fpdf import FPDF
+from datetime import datetime
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
 
+
+def sendMail(fromEmail: str, subject: str, text: str, toEmail: list):
+
+    # Message 
+    msg = MIMEMultipart()
+    msg['From'] = fromEmail
+    msg['To'] = ', '.join(toEmail)  
+    msg['Subject'] = subject
+    msg.attach(MIMEText(text))
+
+    # Attach File to MIME
+    fileToAttach = open('data.pdf', "rb") 
+    attachedfile = MIMEApplication(fileToAttach.read())
+    attachedfile.add_header('content-disposition', 'attachment', filename = 'data.pdf' )
+    msg.attach(attachedfile)
+
+    # SMTP Login and Mail Service 
+    port = 465
+    password = '≈'
+    context = ssl.create_default_context()
+    server = smtplib.SMTP_SSL('smtp.gmail.com', port, context = context)
+    server.login('', password)
+    server.sendmail(fromEmail, toEmail, msg.as_string())
+    server.close()
 
 def getPlayerInformation(): 
 
-    # Getting Players Tag
-    playerTag = input('Please enter your player tag: ')
+    # Getting Player Informations
+    playerTag = sys.argv[1]
     playerTag = playerTag.replace('#', '%23')
-
-    # Read Token FIle
     playerToken = open('token.txt', 'r').read()
-
-    # API URL
-    baseURL = 'https://api.clashroyale.com/v1/players/' + playerTag
+    playerEmail = sys.argv[2]
 
     # API Request
+    baseURL = 'https://api.clashroyale.com/v1/players/' + playerTag
     headers = {'Accept': 'application/json', 'Authorization': 'Bearer ' + playerToken}
-    call = requests.get(baseURL, headers=headers)
+    call = requests.get(baseURL, headers = headers)
     response = call.json()
+    print('Getting Data...')
 
     # Write Request to Log File
     log = open('response.log', 'w')
@@ -32,7 +62,6 @@ def getPlayerInformation():
 
     # Loop through API Call and fill the PDF
     responseKeys = ['tag', 'name', 'expLevel', 'trophies', 'bestTrophies', 'wins', 'losses']
-
     for key in responseKeys: 
         # Workaround for PDF Cell
         value = str(response[key])
@@ -40,7 +69,21 @@ def getPlayerInformation():
         pdf.cell(200, 10, txt = key + ': ' + latin, ln = 1, align = 'C')
 
     pdf.output('data.pdf') 
-
     print('PDF created...')
+
+    # Upload PDF to Server
+    dt = datetime.date(datetime.now())
+    session = ftplib.FTP()
+    session.connect('', 21)
+    session.login('','')
+    fileToUpload = open('data.pdf', 'rb')
+    session.storbinary('STOR data-' + str(dt) + '.pdf', fileToUpload)
+    fileToUpload.close()
+    session.quit()
+    print('PDF uploaded...')
+
+    # Mail Service
+    sendMail(fromEmail = 'm122.royaleapi@gmail.com', subject = 'Royale Api Data', text = 'Vielen Dank, im Anhang finden Sie das PDF mit den Daten.', toEmail = playerEmail)
+    print('Email sent...')
 
 getPlayerInformation()
