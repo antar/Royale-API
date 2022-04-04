@@ -8,7 +8,7 @@ Get your Clash Royale Stats quick and easy.
 pip install requests && pip install fpdf
 
 ### Start: 
-python main.py
+python main.py "Your Clash Royale Tag" "Your Email Address"
 
 ## Author
 
