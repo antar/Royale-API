@@ -48,7 +48,6 @@ def getPlayerInformation():
     headers = {'Accept': 'application/json', 'Authorization': 'Bearer ' + playerToken}
     call = requests.get(baseURL, headers = headers)
     response = call.json()
-    print('Getting Data...')
 
     # Write Request to Log File
     log = open('response.log', 'w')
