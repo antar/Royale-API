@@ -28,7 +28,7 @@ def sendMail(fromEmail: str, subject: str, text: str, toEmail: list):
 
     # SMTP Login and Mail Service 
     port = 465
-    password = '≈'
+    password = ''
     context = ssl.create_default_context()
     server = smtplib.SMTP_SSL('smtp.gmail.com', port, context = context)
     server.login('', password)
@@ -56,17 +56,22 @@ def getPlayerInformation():
     log.close()
 
     # Write Data to PDF
-    pdf = FPDF()
+    pdf = FPDF(orientation = 'P', unit = 'mm', format='A4')
     pdf.add_page()
-    pdf.set_font('Arial', size = 15)
+    pdf.set_font('Arial', 'B', 16)
+    pdf.cell(40, 10, 'Your Royale API Data!', 0, 1)
+    pdf.ln(25)
 
     # Loop through API Call and fill the PDF
     responseKeys = ['tag', 'name', 'expLevel', 'trophies', 'bestTrophies', 'wins', 'losses']
+    formatedKeys = ['Player Tag', 'Player Name', 'Player Level', 'Player Trophies', 'Player Best Trophies', 'Player Wins', 'Player Losses']
+    counter = 0
     for key in responseKeys: 
         # Workaround for PDF Cell
         value = str(response[key])
         latin = value.encode('latin-1', 'replace').decode('latin-1')
-        pdf.cell(200, 10, txt = key + ': ' + latin, ln = 1, align = 'C')
+        pdf.cell(200, 10, txt = formatedKeys[counter] + ': ' + latin, ln = 1, align = 'C')
+        counter += 1
 
     pdf.output('data.pdf') 
     print('PDF created...')
@@ -83,7 +88,7 @@ def getPlayerInformation():
     print('PDF uploaded...')
 
     # Mail Service
-    sendMail(fromEmail = 'm122.royaleapi@gmail.com', subject = 'Royale Api Data', text = 'Vielen Dank, im Anhang finden Sie das PDF mit den Daten.', toEmail = playerEmail)
+    sendMail(fromEmail = '', subject = 'Royale Api Data', text = 'Vielen Dank, im Anhang finden Sie das PDF mit den Daten.', toEmail = playerEmail)
     print('Email sent...')
 
 getPlayerInformation()
