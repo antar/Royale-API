@@ -1,5 +1,5 @@
 # Royale-API
-Get your clash royale stats and save them to pdf.
+Get your clash royale stats and save them to PDF.
 
 ### Installation
 
@@ -8,7 +8,7 @@ git clone https://github.com/antar/Royale-API
 cd Royale-API
 pip install requests && pip install fpdf
 ```
-Create a bearer token on https://developer.clashroyale.com/#/register and set your ip (https://whatismyipaddress.com/de/meine-ip).
+Create a bearer token on https://developer.clashroyale.com/#/register and set your IP (https://whatismyipaddress.com/de/meine-ip).
 
 Copy your token to the ~/Royale-API/token.txt file.
 
