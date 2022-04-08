@@ -75,7 +75,7 @@ def getPlayerInformation():
     pdf = MyFPDF(orientation = 'L', unit = 'mm', format='A4')
     pdf.add_page()
     pdf.image('bg.png', 0, 0, w = 300, h = 300)
-    pdf.add_font('cr', '', 'cr.ttf', uni=F=True)
+    pdf.add_font('cr', '', 'cr.ttf', uni = True)
     pdf.set_font('cr', '', 25)
     pdf.set_text_color(255, 255, 255)
     pdf.cell(0, 10, 'Your Royale API Data!', 0, 0);
