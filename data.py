@@ -49,7 +49,7 @@ def getPlayerInformation():
     today = datetime.date.today()
     first = today.replace(day=1)
     lastMonth = first - datetime.timedelta(days=1)
-    lastSeason = lastMonth.strftime("%Y-%m")
+    lastSeason = lastMonth.strftime('%Y-%m')
 
     # API Requests
     baseURL = 'https://api.clashroyale.com/v1/'
