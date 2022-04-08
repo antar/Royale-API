@@ -4,12 +4,14 @@ import json
 import smtplib
 import ssl
 import ftplib
-from fpdf import FPDF
-from datetime import datetime
+from fpdf import FPDF, HTMLMixin
+import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 
+class MyFPDF(FPDF, HTMLMixin):
+    pass
 
 def sendMail(fromEmail: str, subject: str, text: str, toEmail: list):
 
@@ -28,10 +30,10 @@ def sendMail(fromEmail: str, subject: str, text: str, toEmail: list):
 
     # SMTP Login and Mail Service 
     port = 465
-    password = ''
+    password = 'EmailPassword'
     context = ssl.create_default_context()
     server = smtplib.SMTP_SSL('smtp.gmail.com', port, context = context)
-    server.login('', password)
+    server.login('Email', password)
     server.sendmail(fromEmail, toEmail, msg.as_string())
     server.close()
 
@@ -43,50 +45,83 @@ def getPlayerInformation():
     playerToken = open('token.txt', 'r').read()
     playerEmail = sys.argv[2]
 
-    # API Request
-    baseURL = 'https://api.clashroyale.com/v1/players/' + playerTag
-    headers = {'Accept': 'application/json', 'Authorization': 'Bearer ' + playerToken}
-    call = requests.get(baseURL, headers = headers)
-    response = call.json()
+    # Get Last Season for API Call
+    today = datetime.date.today()
+    first = today.replace(day=1)
+    lastMonth = first - datetime.timedelta(days=1)
+    lastSeason = lastMonth.strftime("%Y-%m")
 
-    # Write Request to Log File
-    log = open('response.log', 'w')
-    log.write(str(response))
-    log.close()
+    # API Requests
+    baseURL = 'https://api.clashroyale.com/v1/'
+    playerInformations = baseURL + 'players/' + playerTag
+    topPlayersInformations = baseURL + 'locations/global/seasons/' + lastSeason + '/rankings/players'
+    headers = {'Accept': 'application/json', 'Authorization': 'Bearer ' + playerToken}
+    callPlayerInformations = requests.get(playerInformations, headers = headers)
+    responsePlayerInformations = callPlayerInformations.json()
+    callTopPlayersInformations = requests.get(topPlayersInformations, headers = headers)
+    responseTopPlayersInformations = callTopPlayersInformations.json()
+
+    # Write Requests to Log File
+    firstLog = open('responsePlayerInformations.log', 'w')
+    firstLog.write(str(responsePlayerInformations))
+    firstLog.close()
+
+    secondLog = open('responseTopPlayersInformations.log', 'w')
+    secondLog.write(str(responseTopPlayersInformations))
+    secondLog.close()
 
     # Write Data to PDF
-    pdf = FPDF(orientation = 'L', unit = 'mm', format='A4')
+    pdf = MyFPDF(orientation = 'L', unit = 'mm', format='A4')
     pdf.add_page()
     pdf.image('bg.png', 0, 0, w = 300, h = 300)
     pdf.add_font('cr', '', 'cr.ttf', uni=True)
     pdf.set_font('cr', '', 16)
     pdf.set_text_color(255, 255, 255)
     pdf.cell(0, 10, 'Your Royale API Data!', 0, 0);
-    pdf.ln(25)
+    pdf.ln(30)
+    pdf.set_text_color(0, 255, 223)
+    pdf.cell(0, 0, 'Player Informations:', 0, 1);
+    pdf.ln(10)
 
-    # Loop through API Call and fill the PDF
-    responseKeys = ['tag', 'name', 'expLevel', 'trophies', 'bestTrophies', 'wins', 'losses']
-    formatedKeys = ['Tag', 'Name', 'Current Level', 'Current Trophies', 'Highest Trophies', 'Total Wins', 'Total Losses']
+    # Loop through API Call and fill the PDF for Player Informations
+    responseKeysPlayerInformations = ['tag', 'name', 'expLevel', 'trophies', 'bestTrophies', 'wins', 'losses']
+    formatedKeysPlayerInformations = ['Tag', 'Name', 'Current Level', 'Current Trophies', 'Highest Trophies', 'Total Wins', 'Total Losses']
     counter = 0
-    for key in responseKeys: 
+    for key in responseKeysPlayerInformations: 
         # Workaround for PDF Cell
-        value = str(response[key])
+        value = str(responsePlayerInformations[key])
         latin = value.encode('latin-1', 'replace').decode('latin-1')
-        pdf.cell(200, 10, txt = formatedKeys[counter] + ': ' + latin, ln = 1)
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(200, 10, txt = formatedKeysPlayerInformations[counter] + ': ' + latin, ln = 1)
+        counter += 1
+    pdf.ln(20)
+    pdf.set_text_color(0, 255, 223)
+    pdf.cell(0, 0, 'Last Season Top Player:', 0, 1);
+    pdf.ln(10)
+
+    # Loop through API Call and fill the PDF for Top Player Informations
+    responseKeysTopPlayersInformations = ['tag', 'name', 'trophies']
+    formatedKeysTopPlayersInformations = ['Tag', 'Name', 'Season Trophies']
+    counter = 0
+    for key in responseKeysTopPlayersInformations:
+        # Workaround for PDF Cell
+        value = str(responseTopPlayersInformations['items'][0][key])
+        latin = value.encode('latin-1', 'replace').decode('latin-1')
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(200, 10, txt = formatedKeysTopPlayersInformations[counter] + ': ' + latin, ln = 1)
         counter += 1
     pdf.output('data.pdf') 
 
     # Upload PDF to Server
-    dt = datetime.date(datetime.now())
-    session = ftplib.FTP()
-    session.connect('', 21)
-    session.login('', '')
-    fileToUpload = open('data.pdf', 'rb')
-    session.storbinary('STOR data-' + str(dt) + '.pdf', fileToUpload)
-    fileToUpload.close()
-    session.quit()
+    # session = ftplib.FTP()
+    # session.connect('ServerName', 21)
+    # session.login('ServerUsername', 'ServerPassword')
+    # fileToUpload = open('data.pdf', 'rb')
+    # session.storbinary('STOR data' + '.pdf', fileToUpload)
+    # fileToUpload.close()
+    # session.quit()
 
     # Mail Service
-    sendMail(fromEmail = '', subject = 'Royale Api Data', text = 'Im Anhang finden Sie das PDF mit den Daten.', toEmail = playerEmail)
+    # sendMail(fromEmail = 'fromEmail', subject = 'Royale Api Data', text = 'Im Anhang finden Sie das PDF mit den Daten.', toEmail = playerEmail)
 
 getPlayerInformation()
