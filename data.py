@@ -43,7 +43,8 @@ def getPlayerInformation():
     playerTag = sys.argv[1]
     playerTag = playerTag.replace('#', '%23')
     playerToken = open('token.txt', 'r').read()
-    playerEmail = sys.argv[2]
+    if len(sys.argv) == 3:
+        playerEmail = sys.argv[2]
 
     # Get Last Season for API Call
     today = datetime.date.today()
@@ -75,10 +76,11 @@ def getPlayerInformation():
     pdf.add_page()
     pdf.image('bg.png', 0, 0, w = 300, h = 300)
     pdf.add_font('cr', '', 'cr.ttf', uni=True)
-    pdf.set_font('cr', '', 16)
+    pdf.set_font('cr', '', 25)
     pdf.set_text_color(255, 255, 255)
     pdf.cell(0, 10, 'Your Royale API Data!', 0, 0);
     pdf.ln(30)
+    pdf.set_font('cr', '', 20)
     pdf.set_text_color(0, 255, 223)
     pdf.cell(0, 0, 'Player Informations:', 0, 1);
     pdf.ln(10)
@@ -91,10 +93,12 @@ def getPlayerInformation():
         # Workaround for PDF Cell
         value = str(responsePlayerInformations[key])
         latin = value.encode('latin-1', 'replace').decode('latin-1')
+        pdf.set_font('cr', '', 15)
         pdf.set_text_color(255, 255, 255)
         pdf.cell(200, 10, txt = formatedKeysPlayerInformations[counter] + ': ' + latin, ln = 1)
         counter += 1
     pdf.ln(20)
+    pdf.set_font('cr', '', 20)
     pdf.set_text_color(0, 255, 223)
     pdf.cell(0, 0, 'Last Season Top Player:', 0, 1);
     pdf.ln(10)
@@ -107,6 +111,7 @@ def getPlayerInformation():
         # Workaround for PDF Cell
         value = str(responseTopPlayersInformations['items'][0][key])
         latin = value.encode('latin-1', 'replace').decode('latin-1')
+        pdf.set_font('cr', '', 15)
         pdf.set_text_color(255, 255, 255)
         pdf.cell(200, 10, txt = formatedKeysTopPlayersInformations[counter] + ': ' + latin, ln = 1)
         counter += 1
