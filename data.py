@@ -4,11 +4,11 @@ import json
 import smtplib
 import ssl
 import ftplib
-from fpdf import FPDF, HTMLMixin
 import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
+from fpdf import FPDF, HTMLMixin
 
 class MyFPDF(FPDF, HTMLMixin):
     pass
@@ -48,8 +48,8 @@ def getPlayerInformation():
 
     # Get Last Season for API Call
     today = datetime.date.today()
-    first = today.replace(day=1)
-    lastMonth = first - datetime.timedelta(days=1)
+    first = today.replace(day = 1)
+    lastMonth = first - datetime.timedelta(days = 1)
     lastSeason = lastMonth.strftime('%Y-%m')
 
     # API Requests
@@ -59,23 +59,23 @@ def getPlayerInformation():
     headers = {'Accept': 'application/json', 'Authorization': 'Bearer ' + playerToken}
     callPlayerInformations = requests.get(playerInformations, headers = headers)
     responsePlayerInformations = callPlayerInformations.json()
-    callTopPlayersInformations = requests.get(topPlayersInformations, headers = headers)
-    responseTopPlayersInformations = callTopPlayersInformations.json()
+    callTopPlayerInformations = requests.get(topPlayersInformations, headers = headers)
+    responseTopPlayerInformations = callTopPlayerInformations.json()
 
     # Write Requests to Log File
     firstLog = open('responsePlayerInformations.log', 'w')
     firstLog.write(str(responsePlayerInformations))
     firstLog.close()
 
-    secondLog = open('responseTopPlayersInformations.log', 'w')
-    secondLog.write(str(responseTopPlayersInformations))
+    secondLog = open('responseTopPlayerInformations.log', 'w')
+    secondLog.write(str(responseTopPlayerInformations))
     secondLog.close()
 
     # Write Data to PDF
     pdf = MyFPDF(orientation = 'L', unit = 'mm', format='A4')
     pdf.add_page()
     pdf.image('bg.png', 0, 0, w = 300, h = 300)
-    pdf.add_font('cr', '', 'cr.ttf', uni=True)
+    pdf.add_font('cr', '', 'cr.ttf', uni=F=True)
     pdf.set_font('cr', '', 25)
     pdf.set_text_color(255, 255, 255)
     pdf.cell(0, 10, 'Your Royale API Data!', 0, 0);
@@ -109,7 +109,7 @@ def getPlayerInformation():
     counter = 0
     for key in responseKeysTopPlayersInformations:
         # Workaround for PDF Cell
-        value = str(responseTopPlayersInformations['items'][0][key])
+        value = str(responseTopPlayerInformations['items'][0][key])
         latin = value.encode('latin-1', 'replace').decode('latin-1')
         pdf.set_font('cr', '', 15)
         pdf.set_text_color(255, 255, 255)
