@@ -1,14 +1,28 @@
 # Royale-API
-Get your Clash Royale Stats quick and easy.
+Get your clash royale stats and save them to pdf.
 
 ### Installation
 
-#### First: 
-
+```console
+git clone https://github.com/antar/Royale-API
+cd Royale-API
 pip install requests && pip install fpdf
+```
+Create a bearer token on https://developer.clashroyale.com/#/register and set your ip (https://whatismyipaddress.com/de/meine-ip).
+
+Copy your token to the ~/Royale-API/token.txt file.
 
 ### Start: 
-python main.py "Your Clash Royale Tag" "Your Email Address"
+```console
+python data.py "Your Clash Royale Tag" "Your Email Address"
+```
+The email parameter is optional and works correctly if you have set the smpt requirements.
+
+### Examples:
+```console
+python data.py "#G9YV9GR8R"
+python data.py "#QCCJVJR9"
+```
 
 ## Author
 
