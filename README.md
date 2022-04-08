@@ -24,6 +24,9 @@ python data.py "#G9YV9GR8R"
 python data.py "#QCCJVJR9"
 ```
 
+### Output:
+PDF will be created in the root folder ~/Royale-API/data.pdf
+
 ## Author
 
 * **antar** - *Initial work* - [antar](https://github.com/antar)
