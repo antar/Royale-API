@@ -42,7 +42,7 @@ def getPlayerInformation():
     # Getting Player Informations
     playerTag = sys.argv[1]
     playerTag = playerTag.replace('#', '%23')
-    playerToken = open('token.txt', 'r').read()
+    playerToken = open('token.txt', 'r').read().strip()
     if len(sys.argv) == 3:
         playerEmail = sys.argv[2]
 
